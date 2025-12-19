@@ -41,7 +41,7 @@ stages {
       docker run -d -p 8001:80 --network mynet --name movie-service $DOCKER_ID/$DOCKER_MS:latest
       docker run -d -p 8002:80 --network mynet --name cast-service $DOCKER_ID/$DOCKER_CAST:latest
       docker run -d -p 5432:5432 --network mynet --name bdd $DOCKER_ID/$BDD:latest
-      docker run -d -p 8080:80 --network mynet --name sweb $DOCKER_ID/$NGINX:latest
+      docker run -d -p 8081:80 --network mynet --name sweb $DOCKER_ID/$NGINX:latest
       sleep 10
       '''
       }
