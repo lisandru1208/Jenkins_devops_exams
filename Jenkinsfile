@@ -11,8 +11,8 @@ agent any // Jenkins will be able to select all available agents
       stage('Docker Build') {
         steps {
           script {
-            movieService = docker.build("$DOCKER_ID/$DOCKER_MS:latest", "./DOCKER_MS")
-            castService = docker.build("$DOCKER_ID/$DOCKER_CAST:latest", "./DOCKER_CAST")
+            movieService = docker.build("$DOCKER_ID/$DOCKER_MS:latest", "./$DOCKER_MS")
+            castService = docker.build("$DOCKER_ID/$DOCKER_CAST:latest", "./$DOCKER_CAST")
             bddService = docker.pull("$NGINX:latest", "$DOCKER_ID/$NGINX:latest")
             nginxService = docker.pull("$BDD:12.1-alpine", "$DOCKER_ID/$BDD:latest")
           }
@@ -71,5 +71,5 @@ agent any // Jenkins will be able to select all available agents
       }
 
     }
-    
+
 }
