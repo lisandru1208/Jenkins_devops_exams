@@ -6,6 +6,7 @@ pipeline {
         DOCKER_CAST  = "cast-service"
         BDD          = "postgres"
         NGINX        = "nginx"
+        DOCKER_PASS = credentials('DOCKER_HUB_PASS')
     }
     stages {
         stage('Docker Build') {
@@ -59,8 +60,6 @@ pipeline {
                 docker.withRegistry('', '$DOCKER_PASS') {
                     movieService.push("latest")
                     castService.push("latest")
-                    bddService.push("latest")
-                    nginxService.push("latest")
                 }
               }
             }
