@@ -50,7 +50,7 @@ pipeline {
         stage('Docker Push') {
             steps {
                 // Utiliser les credentials Jenkins pour push sécurisé
-                docker.withRegistry('', 'docker-hub-creds') {
+                docker.withRegistry('', '$DOCKER_PASS') {
                     movieService.push("latest")
                     castService.push("latest")
                     bddService.push("latest")
