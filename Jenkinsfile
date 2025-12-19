@@ -14,11 +14,12 @@ stages {
       sh '''
         docker rm -f movie-service cast-service bdd sweb 
         docker network create mynet
+
         docker build -t "$DOCKER_ID/$DOCKER_MS:latest" ./$DOCKER_MS
-        docker tag "$DOCKER_ID/$DOCKER_MS:latest" "$CI_REGISTRY_IMAGE/$DOCKER_MS:latest"
+        docker tag "$DOCKER_ID/$DOCKER_MS:latest" "$DOCKER_ID/$DOCKER_MS:latest"
 
         docker build -t "$DOCKER_ID/$DOCKER_CAST:latest" ./$DOCKER_CAST
-        docker tag "$DOCKER_ID/$DOCKER_CAST:latest" "$CI_REGISTRY_IMAGE/$DOCKER_CAST:latest"
+        docker tag "$DOCKER_ID/$DOCKER_CAST:latest" "$DOCKER_ID/$DOCKER_CAST:latest"
 
         docker pull $BDD:12.1-alpine
         docker tag $BDD:12.1-alpine "$DOCKER_ID/$BDD:12.1-alpine"
