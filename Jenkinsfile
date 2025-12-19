@@ -6,7 +6,6 @@ pipeline {
         DOCKER_CAST  = "cast-service"
         BDD          = "postgres"
         NGINX        = "nginx"
-        DOCKER_PASS = credentials('DOCKER_HUB_PASS')
     }
     stages {
         stage('Docker Build') {
@@ -54,9 +53,11 @@ pipeline {
         }
 
         stage('Docker Push') {
+            environment {
+                DOCKER_PASS = credentials('DOCKER_HUB_PASS') 
+            }
             steps {
               script {
-                // Utiliser les credentials Jenkins pour push sécurisé
                 docker.withRegistry('', '$DOCKER_PASS') {
                     movieService.push("latest")
                     castService.push("latest")
