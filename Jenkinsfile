@@ -53,12 +53,9 @@ pipeline {
         }
 
         stage('Docker Push') {
-            environment {
-                DOCKER_PASS = credentials('DOCKER_HUB_PASS') 
-            }
             steps {
               script {
-                docker.withRegistry('', '$DOCKER_PASS') {
+                docker.withRegistry('', 'DOCKER_HUB_PASS') {
                     movieService.push("latest")
                     castService.push("latest")
                 }
