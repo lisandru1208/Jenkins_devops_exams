@@ -56,7 +56,7 @@ stages {
       }
     }
   }
-  ('Docker Push') {
+  stage('Docker Push') {
         environment {
                 DOCKER_PASS = credentials('DOCKER_HUB_PASS') //variable secretS
         }
