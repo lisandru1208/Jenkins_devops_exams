@@ -11,6 +11,11 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    sh '''
+                        docker rm -f movie-service cast-service bdd sweb || true
+                        docker network rm mynet || true
+                        docker network create mynet
+                    '''
                     // Construire les images locales
                     movieService = docker.build("$DOCKER_ID/$DOCKER_MS:latest", "./$DOCKER_MS")
                     castService  = docker.build("$DOCKER_ID/$DOCKER_CAST:latest", "./$DOCKER_CAST")
