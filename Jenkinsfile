@@ -62,5 +62,84 @@ pipeline {
               }
             }
         }
+          stage('Deploiement en dev'){
+            environment {
+                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+            }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp charts/values.yaml values.yaml
+                cat values.yaml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                helm upgrade --install app cinema --values=values.yml --namespace dev
+                '''
+                }
+            }
+        }
+                  stage('Deploiement en QA'){
+            environment {
+                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+            }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp charts/values.yaml values.yaml
+                cat values.yaml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                helm upgrade --install app cinema --values=values.yml --namespace qa
+                '''
+                }
+            }
+        }
+                  stage('Deploiement en staging '){
+            environment {
+                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+            }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp charts/values.yaml values.yaml
+                cat values.yaml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                helm upgrade --install app cinema --values=values.yml --namespace staging
+                '''
+                }
+            }
+        }
+                  stage('Deploiement en prod'){
+            environment {
+                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+            }
+            steps {
+                timeout(time: 15, unit: "MINUTES") {
+                   input message: 'Voulez vous deployer en production ?', ok: 'Yes'
+                }
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp charts/values.yaml values.yaml
+                cat values.yaml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                helm upgrade --install app cinema --values=values.yml --namespace prod
+                '''
+                }
+            }
+        }
     }
 }

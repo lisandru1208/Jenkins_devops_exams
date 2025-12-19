@@ -1,59 +1,204 @@
-version: '3.7'
+# DATABASE MOVIE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-db
+  namespace: jenkinstest
+spec:
+  selector:
+    matchLabels:
+      app: movie-db
+  template:
+    metadata:
+      labels:
+        app: movie-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:12.1-alpine
+        env:
+        - name: POSTGRES_USER
+          value: movie_db_username
+        - name: POSTGRES_PASSWORD
+          value: movie_db_password
+        - name: POSTGRES_DB
+          value: movie_db_dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-db
+  namespace: jenkinstest
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: movie-db
+---
+# APP MOVIE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service
+  namespace: jenkinstest
+spec:
+  selector:
+    matchLabels:
+      app: movie-service
+  template:
+    metadata:
+      labels:
+        app: movie-service
+    spec:
+      containers:
+      - name: movie-service
+        image: lisandru1208/movie-service:latest
+        command: ["/bin/sh", "-c"]
+        args: ["uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio"]
+        env:
+        - name: DATABASE_URI
+          value: postgresql://movie_db_username:movie_db_password@movie-db/movie_db_dev
+        - name: CAST_SERVICE_HOST_URL
+          value: http://cast-service:8000/api/v1/casts/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-service
+  namespace: jenkinstest
+spec:
+  ports:
+    - port: 8000
+  selector:
+    app: movie-service
 
-services:
-  movie_service:
-    build: ./movie-service
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    volumes:
-      - ./movie-service/:/app/
-    ports:
-      - 8001:8000
-    environment:
-      - DATABASE_URI=postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev
-      - CAST_SERVICE_HOST_URL=http://cast_service:8000/api/v1/casts/
-    depends_on:
-      - movie_db
+    # DATABASE CAST
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-db
+  namespace: jenkinstest
+spec:
+  selector:
+    matchLabels:
+      app: cast-db
+  template:
+    metadata:
+      labels:
+        app: cast-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:12.1-alpine
+        env:
+        - name: POSTGRES_USER
+          value: cast_db_username
+        - name: POSTGRES_PASSWORD
+          value: cast_db_password
+        - name: POSTGRES_DB
+          value: cast_db_dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-db
+  namespace: jenkinstest
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: cast-db
+---
+# APP CAST
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-service
+  namespace: jenkinstest
+spec:
+  selector:
+    matchLabels:
+      app: cast-service
+  template:
+    metadata:
+      labels:
+        app: cast-service
+    spec:
+      containers:
+      - name: cast-service
+        image: lisandru1208/cast-service:latest
+        command: ["/bin/sh", "-c"]
+        args: ["uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio"]
+        env:
+        - name: DATABASE_URI
+          value: postgresql://cast_db_username:cast_db_password@cast-db/cast_db_dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-service
+  namespace: jenkinstest
+spec:
+  ports:
+    - port: 8000
+  selector:
+    app: cast-service
 
-  movie_db:
-    image: postgres:12.1-alpine
-    volumes:
-      - postgres_data_movie:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=movie_db_username
-      - POSTGRES_PASSWORD=movie_db_password
-      - POSTGRES_DB=movie_db_dev
-
-  cast_service:
-    build: ./cast-service
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    volumes:
-      - ./cast-service/:/app/
-    ports:
-      - 8002:8000
-    environment:
-      - DATABASE_URI=postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
-    depends_on:
-      - cast_db
-
-  cast_db:
-    image: postgres:12.1-alpine
-    volumes:
-      - postgres_data_cast:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=cast_db_username
-      - POSTGRES_PASSWORD=cast_db_password
-      - POSTGRES_DB=cast_db_dev
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - cast_service
-      - movie_service
-
-volumes:
-  postgres_data_movie:
-  postgres_data_cast:
+    apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: jenkinstest
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        location /movies {
+            proxy_pass http://movie-service:8000/api/v1/movies;
+        }
+        location /casts {
+            proxy_pass http://cast-service:8000/api/v1/casts;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: jenkinstest
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-external
+  namespace: jenkinstest
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 32442
+  selector:
+    app: nginx
