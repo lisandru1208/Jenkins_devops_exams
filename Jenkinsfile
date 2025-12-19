@@ -13,6 +13,7 @@ stages {
       script {
       sh '''
         docker rm -f movie-service cast-service bdd sweb 
+        docker rm -f mynet
         docker network create mynet
 
         docker build -t "$DOCKER_ID/$DOCKER_MS:latest" ./$DOCKER_MS
