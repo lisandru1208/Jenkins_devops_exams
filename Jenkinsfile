@@ -58,12 +58,18 @@ agent any // Jenkins will be able to select all available agents
       }
       stage('Push image') {
         // Push sécurisé via credentials Jenkins
-        docker.withRegistry('', '$DOCKER_PASS') {
-            movieService.push("latest")        
-            castService.push("latest")               
-            bddService.push("latest")                      
-            nginxService.push("latest")               
-        }  
+          steps {
+            script {
+              docker.withRegistry('', '$DOCKER_PASS') {
+                  movieService.push("latest")        
+                  castService.push("latest")               
+                  bddService.push("latest")                      
+                  nginxService.push("latest")               
+              }  
+            }
+          }   
       }
+
     }
+    
 }
