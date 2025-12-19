@@ -49,6 +49,7 @@ pipeline {
 
         stage('Docker Push') {
             steps {
+              script {
                 // Utiliser les credentials Jenkins pour push sécurisé
                 docker.withRegistry('', '$DOCKER_PASS') {
                     movieService.push("latest")
@@ -56,6 +57,7 @@ pipeline {
                     bddService.push("latest")
                     nginxService.push("latest")
                 }
+              }
             }
         }
     }
