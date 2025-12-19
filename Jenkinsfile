@@ -56,10 +56,12 @@ stages {
       }
     }
   }
-stage('Docker Push') {
+  ('Docker Push') {
+        environment {
+                DOCKER_PASS = credentials('DOCKER_HUB_PASS') //variable secretS
+        }
         steps {
             script {
-                withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
                     sh '''
                         docker login -u $DOCKER_ID -p $DOCKER_PASS
                         docker push $DOCKER_ID/$DOCKER_MS:$latest --quiet=false --progress=plain
@@ -67,7 +69,6 @@ stage('Docker Push') {
                         docker push $DOCKER_ID/$BDD:$latest --quiet=false --progress=plain
                         docker push $DOCKER_ID/$NGINX:$latest --quiet=false --progress=plain
                     '''
-                }
             }
         }
     } 
