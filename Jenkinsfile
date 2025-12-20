@@ -76,7 +76,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
-                helm upgrade --install app cinema --values=values.yml --namespace dev
+                helm upgrade --install app charts --values=values.yml --namespace dev
                 '''
                 }
             }
@@ -95,7 +95,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
-                helm upgrade --install app cinema --values=values.yml --namespace qa
+                helm upgrade --install app charts --values=values.yml --namespace qa
                 '''
                 }
             }
@@ -114,7 +114,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
-                helm upgrade --install app cinema --values=values.yml --namespace staging
+                helm upgrade --install app charts --values=values.yml --namespace staging
                 '''
                 }
             }
@@ -136,7 +136,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
-                helm upgrade --install app cinema --values=values.yml --namespace prod
+                helm upgrade --install app charts --values=values.yml --namespace prod
                 '''
                 }
             }

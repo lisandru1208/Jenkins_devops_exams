@@ -20,4 +20,4 @@ images:
   service:
     dbPort: 5432
     appPort: 8000
-    nginxPort: 8080
+    nginxPort: 8081
