@@ -17,7 +17,12 @@ images:
 nginx:
   port: 8080
   nodePort: 5432
+
 service:
   dbPort: 5432
   appPort: 8000
   nginxPort: 8081
+
+storage:
+  size: 1Gi
+  class: standard
