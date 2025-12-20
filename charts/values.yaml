@@ -14,6 +14,9 @@ images:
   postgres: postgres:12.1-alpine
   nginx: nginx:latest
 
+nginx:
+  port: 8080
+  nodePort: 5432
 service:
   dbPort: 5432
   appPort: 8000
