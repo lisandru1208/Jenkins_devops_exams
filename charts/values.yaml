@@ -1,28 +1,29 @@
-auth:
-  movie:
-    user: "movie_db_username"
-    pass: "movie_db_password"
-    dbName: "movie_db_dev"
-  cast:
-    user: "cast_db_username"
-    pass: "cast_db_password"
-    dbName: "cast_db_dev"
+movieDb:
+  image: "postgres:12.1-alpine"
+  user: "movie_db_username"
+  password: "movie_db_password"
+  dbName: "movie_db_dev"
+  pvc: "movie-db-pvc"
 
-images:
-  movie: lisandru1208/movie-service:latest
-  cast: lisandru1208/cast-service:latest
-  postgres: postgres:12.1-alpine
-  nginx: nginx:latest
+castDb:
+  image: "postgres:12.1-alpine"
+  user: "cast_db_username"
+  password: "cast_db_password"
+  dbName: "cast_db_dev"
+  pvc: "cast-db-pvc"
+
+movieService:
+  image: "lisandru1208/movie-service:latest"
+  port: 8000
+  dbUri: "postgresql://movie_db_username:movie_db_password@movie-db:5432/movie_db_dev"
+
+castService:
+  image: "lisandru1208/cast-service:latest"
+  port: 8000
+  dbUri: "postgresql://cast_db_username:cast_db_password@cast-db:5432/cast_db_dev"
 
 nginx:
-  port: 8080
-  nodePort: 30001
-
-service:
-  dbPort: 5432
-  appPort: 8000
+  image: "nginx:latest"
   nginxPort: 8081
-
-storage:
-  size: 1Gi
-  class: standard
+  nodePort: 30001
+  configMap: "nginx-config"
