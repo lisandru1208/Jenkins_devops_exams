@@ -14,12 +14,10 @@ castDb:
 
 movieService:
   image: "lisandru1208/movie-service:latest"
-  port: 8000
   dbUri: "postgresql://movie_db_username:movie_db_password@movie-db:5432/movie_db_dev"
 
 castService:
   image: "lisandru1208/cast-service:latest"
-  port: 8000
   dbUri: "postgresql://cast_db_username:cast_db_password@cast-db:5432/cast_db_dev"
 
 service:
@@ -32,3 +30,7 @@ nginx:
   port: 8081
   nodePort: 30001
   configMap: "nginx-config"
+
+storage:
+  size: 1Gi
+  class: standard
