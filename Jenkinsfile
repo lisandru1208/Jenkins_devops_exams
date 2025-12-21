@@ -75,7 +75,6 @@ pipeline {
                 cat $KUBECONFIG > .kube/config
                 cp charts/values.yaml values.yaml
                 cat values.yaml
-                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace dev
                 '''
                 }
@@ -84,6 +83,7 @@ pipeline {
                   stage('Deploiement en QA'){
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                NGINX_PORT = 8082
             }
             steps {
                 script {
@@ -94,7 +94,7 @@ pipeline {
                 cat $KUBECONFIG > .kube/config
                 cp charts/values.yaml values.yaml
                 cat values.yaml
-                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace qa
                 '''
                 }
@@ -103,6 +103,7 @@ pipeline {
                   stage('Deploiement en staging '){
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                NGINX_PORT = 8083
             }
             steps {
                 script {
@@ -113,7 +114,7 @@ pipeline {
                 cat $KUBECONFIG > .kube/config
                 cp charts/values.yaml values.yaml
                 cat values.yaml
-                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace staging
                 '''
                 }
@@ -122,6 +123,7 @@ pipeline {
                   stage('Deploiement en prod'){
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                NGINX_PORT = 8084
             }
             steps {
                 timeout(time: 15, unit: "MINUTES") {
@@ -135,7 +137,7 @@ pipeline {
                 cat $KUBECONFIG > .kube/config
                 cp charts/values.yaml values.yaml
                 cat values.yaml
-                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yaml
+                sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace prod
                 '''
                 }
