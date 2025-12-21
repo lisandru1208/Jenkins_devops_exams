@@ -4,7 +4,7 @@ metadata:
   name: configmapmovie
   namespace: {{ .Values.namespace }}
 data:
-  username: {{ .Values.auth.movie.user | quote }}
+  username: {{ .Values.movieDb.ruser | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -12,7 +12,7 @@ metadata:
   name: configmapcast
   namespace: {{ .Values.namespace }}
 data:
-  username: {{ .Values.auth.cast.user | quote }}
+  username: {{ .Values.castDb.user | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap

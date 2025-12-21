@@ -18,9 +18,16 @@ spec:
         image: {{ .Values.movieDb.image }}
         env:
         - name: POSTGRES_USER
-          value: {{ .Values.movieDb.user }}
+          valueFrom:
+            configMapKeyRef:
+              name: configmapmovie
+              key: username
+
         - name: POSTGRES_PASSWORD
-          value: {{ .Values.movieDb.password }}
+          valueFrom:
+            secretKeyRef:
+              name: pwdmovie
+              key: password
         - name: POSTGRES_DB
           value: {{ .Values.movieDb.dbName }}
         volumeMounts:
@@ -52,10 +59,17 @@ spec:
       - name: postgres
         image: {{ .Values.castDb.image }}
         env:
-        - name: POSTGRES_USER
-          value: {{ .Values.castDb.user }}
         - name: POSTGRES_PASSWORD
-          value: {{ .Values.castDb.password }}
+          valueFrom:
+            secretKeyRef:
+              name: pwdcast
+              key: password
+
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: configmapcast
+              key: username
         - name: POSTGRES_DB
           value: {{ .Values.castDb.dbName }}
         volumeMounts:
