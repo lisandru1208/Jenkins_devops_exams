@@ -84,6 +84,7 @@ pipeline {
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 NGINX_PORT = 8082
+                NGINX_NODEPORT = 30002
             }
             steps {
                 script {
@@ -95,6 +96,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
+                sed -i "s+nodePort: 30001+nodePort: ${NGINX_NODEPORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace qa
                 '''
                 }
@@ -104,6 +106,7 @@ pipeline {
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 NGINX_PORT = 8083
+                NGINX_NODEPORT = 30003
             }
             steps {
                 script {
@@ -115,6 +118,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
+                sed -i "s+nodePort: 30001+nodePort: ${NGINX_NODEPORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace staging
                 '''
                 }
@@ -124,6 +128,7 @@ pipeline {
             environment {
                 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 NGINX_PORT = 8084
+                NGINX_NODEPORT = 30004
             }
             steps {
                 timeout(time: 15, unit: "MINUTES") {
@@ -138,6 +143,7 @@ pipeline {
                 cp charts/values.yaml values.yaml
                 cat values.yaml
                 sed -i "s+nginxPort: 8081+nginxPort: ${NGINX_PORT}+g" values.yaml
+                sed -i "s+nodePort: 30001+nodePort: ${NGINX_NODEPORT}+g" values.yaml
                 helm upgrade --install app charts --values=values.yaml --namespace prod
                 '''
                 }
