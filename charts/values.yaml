@@ -16,7 +16,7 @@ images:
 
 nginx:
   port: 8080
-  nodePort: 5432
+  nodePort: 30001
 
 service:
   dbPort: 5432
