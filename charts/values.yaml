@@ -22,8 +22,13 @@ castService:
   port: 8000
   dbUri: "postgresql://cast_db_username:cast_db_password@cast-db:5432/cast_db_dev"
 
+service:
+  dbPort: 5432
+  appPort: 8000
+  nginxPort: 8081
+
 nginx:
   image: "nginx:latest"
-  nginxPort: 8081
+  port: 8081
   nodePort: 30001
   configMap: "nginx-config"
